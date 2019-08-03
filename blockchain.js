@@ -1,10 +1,17 @@
 /* Package Imports */
 const sha256 = require('sha256');
+const currentNodeUrl = process.argv[3];
 
 /* Blockchain Data Structure */
 function Blockchain(){
     this.chain = [];
     this.pendingTransactions = [];
+
+    // assign current node url
+    this.currentNodeUrl = currentNodeUrl;
+
+    // let node be aware of other nodes on the network
+    this.networkNodes = [];
 
     // generate genesis block
     this.createNewBlock(100, '0', '0');
