@@ -94,7 +94,7 @@ app.post('/register-new-node', (req, res) => {
     // variable to see if new node url doesnt match current nodes url
     const notCurrentNode = blockchain.currentNodeUrl !== newNodeUrl;
     // register new node url to the current nodes network if it doesnt exist and not the same as the current node
-    if(nodeNotPresent && notCurrentNode){
+    if (nodeNotPresent && notCurrentNode) {
         blockchain.networkNodes.push(newNodeUrl);
     };
     // send response
@@ -104,8 +104,24 @@ app.post('/register-new-node', (req, res) => {
 });
 
 // register multiple nodes at once
-app.post('/register-nodes-bulk', (req, res) => {
+app.post('/register-network-nodes', (req, res) => {
+    // get all network nodes from body
+    const { allNetworkNodes } = req.body;
+    // register all node urls with the new node
+    allNetworkNodes.forEach(nodeUrl => {
+        // coniditions to not add nodeUrl
+        const nodeNotPresent = blockchain.networkNodes.indexOf(nodeUrl) === -1;
+        const uniqueNodeUrl = blockchain.currentNodeUrl !== nodeUrl;
+        console.log(nodeNotPresent, uniqueNodeUrl)
+        // check for the conditions
+        if (nodeNotPresent && uniqueNodeUrl) {
+            blockchain.networkNodes.push(nodeUrl);
+        };
+    });
 
+    res.json({
+        note: 'Added network nodes to the new node'
+    });
 });
 
 app.listen(port, () => console.log(`Network node running on port: ${port}`));
