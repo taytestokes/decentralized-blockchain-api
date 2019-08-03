@@ -15,15 +15,17 @@ Blockchain.prototype.createNewBlock = function(nonce, previousBlockHash, hash){
         previousBlockHash,
         hash
     };
-
     // clear transactions array
     this.newTransactions = [];
-
     // add the new block to the chain
     this.chain.push(newBlock);
-
     // return the new block
     return newBlock;
+};
+
+Blockchain.prototype.getLastBlock = function(){
+    // return last block on the chain
+    return this.chain[this.chain.length - 1];
 };
 
 
