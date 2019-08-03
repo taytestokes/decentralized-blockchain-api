@@ -5,6 +5,9 @@ const sha256 = require('sha256');
 function Blockchain(){
     this.chain = [];
     this.pendingTransactions = [];
+
+    // generate genesis block
+    this.createNewBlock(100, '0', '0');
 };
 
 /* Blockchain Prototype Methods */
