@@ -1,7 +1,7 @@
 /* Blockchain Data Structure */
 function Blockchain(){
     this.chain = [];
-    this.newTransactions = [];
+    this.pendingTransactions = [];
 };
 
 /* Blockchain Prototype Methods */
@@ -10,13 +10,13 @@ Blockchain.prototype.createNewBlock = function(nonce, previousBlockHash, hash){
     const newBlock = {
         index: this.chain.length + 1,
         timeStamp: Date.now(),
-        transactions: this.newTransactions,
+        transactions: this.pendingTransactions,
         nonce,
         previousBlockHash,
         hash
     };
     // clear transactions array
-    this.newTransactions = [];
+    this.pendingTransactions = [];
     // add the new block to the chain
     this.chain.push(newBlock);
     // return the new block
@@ -26,6 +26,21 @@ Blockchain.prototype.createNewBlock = function(nonce, previousBlockHash, hash){
 Blockchain.prototype.getLastBlock = function(){
     // return last block on the chain
     return this.chain[this.chain.length - 1];
+};
+
+Blockchain.prototype.createNewTransaction = function(amount, sender, recipient){
+    // create transaction object
+    const newTransaction = {
+        amount,
+        sender,
+        recipient
+    };
+    // add to the transactions array
+    this.pendingTransactions.push(newTransaction);
+    // find new transaction (last block on chain)
+    const lastBlock = this.getLastBlock();
+    // return the number of the block the transaction was added to
+    return lastBlock['index'] + 1;
 };
 
 
