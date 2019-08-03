@@ -52,7 +52,7 @@ app.get('/mine', (req, res) => {
 // register a node and broadcast it to the network
 app.post('/register-and-broadcast-node', (req, res) => {
     // create the new node url
-    const newNodeUrl = req.body.newNodeUrl;
+    const { newNodeUrl } = req.body;
     // create an array to hold the promises made for each node
     const registerNodePromises = [];
     // register node url to the network if it isn't already on the network
@@ -87,7 +87,20 @@ app.post('/register-and-broadcast-node', (req, res) => {
 
 // register node to the network
 app.post('/register-new-node', (req, res) => {
-
+    // define new node url
+    const { newNodeUrl } = req.body;
+    // variable to see if node is already in network
+    const nodeNotPresent = blockchain.networkNodes.indexOf(newNodeUrl);
+    // variable to see if new node url doesnt match current nodes url
+    const notCurrentNode = blockchain.currentNodeUrl !== newNodeUrl;
+    // register new node url to the current nodes network if it doesnt exist and not the same as the current node
+    if(nodeNotPresent && notCurrentNode){
+        blockchain.networkNodes.push(newNodeUrl);
+    };
+    // send response
+    res.json({
+        note: 'New node has been registered!'
+    });
 });
 
 // register multiple nodes at once
