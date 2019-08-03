@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 const uuid = require('uuid/v1');
 const port = process.argv[2];
+const axios = require('axios');
 
 // unique string for node address
 const nodeAdress = uuid().split('-').join('');
@@ -23,7 +24,7 @@ app.get('/blockchain', (req, res) => {
 app.post('/transaction', (req, res) => {
     const { amount, sender, recipient } = req.body;
     const blockIndex = blockchain.createNewTransaction(amount, sender, recipient);
-    res.json({note: `transaction will be added in ${blockIndex}`});
+    res.json({ note: `transaction will be added in ${blockIndex}` });
 });
 
 // create a new block
@@ -46,6 +47,52 @@ app.get('/mine', (req, res) => {
         note: "New block mined succesfully!",
         block: newBlock
     });
+});
+
+// register a node and broadcast it to the network
+app.post('/register-and-broadcast-node', (req, res) => {
+    // create the new node url
+    const newNodeUrl = req.body.newNodeUrl;
+    // create an array to hold the promises made for each node
+    const registerNodePromises = [];
+    // register node url to the network if it isn't already on the network
+    if (blockchain.networkNodes.indexOf(newNodeUrl) === -1) {
+        blockchain.networkNodes.push(newNodeUrl);
+    };
+    // broadcast new node to other nodes in the network
+    blockchain.networkNodes.forEach(nodeUrl => {
+        // for every node on the network make a req to '/register-new-node'
+        const request = axios.post(`${nodeUrl}/register-new-node`, { newNodeUrl });
+        // push the request promise obj into 
+        registerNodePromises.push(request);
+    });
+    // run all of the promises in registerNodePromises
+    Promise.all(registerNodePromises)
+        .then(data => {
+
+            return axios.post(`${newNodeUrl}/register-new-node`, { allNetworkNodes: [...blockchain.networkNodes, blockchain.currentNodeUrl] })
+        })
+        .then(data => {
+            res.json({
+                note: 'New node registered with network succesfully!'
+            })
+        })
+        .catch(error => {
+            res.json({
+                note: 'Something went wrong, please try again!',
+                error
+            })
+        });
+});
+
+// register node to the network
+app.post('/register-new-node', (req, res) => {
+
+});
+
+// register multiple nodes at once
+app.post('/register-nodes-bulk', (req, res) => {
+
 });
 
 app.listen(port, () => console.log(`Network node running on port: ${port}`));
