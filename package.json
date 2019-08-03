@@ -2,9 +2,14 @@
   "name": "blockchain",
   "version": "1.0.0",
   "description": "",
-  "main": "server/index.js",
+  "main": "api/networkNode.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "node_1": "nodemon --watch dev -e js api/networkNode.js 3001",
+    "node_2": "nodemon --watch dev -e js api/networkNode.js 3002",
+    "node_3": "nodemon --watch dev -e js api/networkNode.js 3003",
+    "node_4": "nodemon --watch dev -e js api/networkNode.js 3004",
+    "node_5": "nodemon --watch dev -e js api/networkNode.js 3005"
   },
   "keywords": [],
   "author": "",

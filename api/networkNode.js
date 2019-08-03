@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express();
 const uuid = require('uuid/v1');
+const port = process.argv[2];
 
 // unique string for node address
 const nodeAdress = uuid().split('-').join('');
@@ -47,4 +48,4 @@ app.get('/mine', (req, res) => {
     });
 });
 
-app.listen(3005, () => console.log('Server running!'));
+app.listen(port, () => console.log(`Network node running on port: ${port}`));
