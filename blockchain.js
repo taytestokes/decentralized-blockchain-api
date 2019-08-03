@@ -1,3 +1,6 @@
+/* Package Imports */
+const sha256 = require('sha256');
+
 /* Blockchain Data Structure */
 function Blockchain(){
     this.chain = [];
@@ -43,8 +46,13 @@ Blockchain.prototype.createNewTransaction = function(amount, sender, recipient){
     return lastBlock['index'] + 1;
 };
 
-Blockchain.prototype.hashBlock = function(blockData){
-    
+Blockchain.prototype.hashBlock = function(previousBlockHash, currentBlockData, nonce){
+    // change data to a single string
+    const dataAsString = previousBlockHash + nonce.toString() + JSON.stringify(currentBlockData);
+    // create hash of data
+    const hash = sha256(dataAsString);
+    // return the hash
+    return hash;
 };
 
 /* Export Blockchain Data Structure */
