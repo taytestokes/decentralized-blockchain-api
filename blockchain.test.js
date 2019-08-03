@@ -2,18 +2,27 @@
 const Blockchain = require('./blockchain');
 
 /* New Instance of Blockchain Data Structue */
-const chain = new Blockchain();
+const crypto = new Blockchain();
 
 /* Tests */
+const previousBlockHash = 'ASDFHJVD213'
+const currentBlockData = [
+    {
+        amount: 23,
+        sender: 'HGDVKJB234',
+        recipient: 'JKHUDS324'
+    },
+    {
+        amount: 333,
+        sender: 'KJDBVHJKBSBV324324',
+        recipient: 'AVSVEDBV234'
+    },
+    {
+        amount: 103,
+        sender: 'CBSBGFJWKBF234',
+        recipient: '324KJBFS234'
+    }
+];
 
-// createNewBlock
-// chain.createNewBlock(1234, 'LKHJSP234DFS', 'SDKLFHVPOE987632');
-// chain.createNewBlock(2343, 'SDKLFHVPOE987632', 'KJDAFJKHV832');
-chain.createNewBlock(32454, 'SDGVIDNDCJKS23', 'LDJCIS23');
 
-// createNewTransaction
-chain.createNewTransaction(100, 'ALEXJFHBVD03241', 'JENIUYCV234');
-chain.createNewBlock(3249, 'JDF2348234', '345834DFJHBF');
-
-
-console.log(chain);
+console.log(crypto.hashBlock(previousBlockHash, currentBlockData, 18041));

@@ -55,5 +55,21 @@ Blockchain.prototype.hashBlock = function(previousBlockHash, currentBlockData, n
     return hash;
 };
 
+Blockchain.prototype.proofOfWork = function(previousBlockHash, currentBlockData){
+    // define a nonce
+    let nonce = 0;
+    // hash data
+    let hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+    // check for correct hash value
+    while (hash.substring(0,4) !== '0000'){
+        // increment nonce by 1
+        nonce++;
+        // run hashblock method again
+        hash = this.hashBlock(previousBlockHash, currentBlockData, nonce);
+    };
+    // return nonce
+    return nonce;
+};
+
 /* Export Blockchain Data Structure */
 module.exports = Blockchain;
