@@ -286,7 +286,15 @@ app.get('/bock/:blockHash', (req, res) => {
 });
 
 app.get('/transaction/:transactionId', (req, res) => {
-
+    // take transaction id from req params
+    const { transactionId } = req.params;
+    // use get transaction
+    const result = blockchain.getTransaction(transactionId);
+    // send result back
+    res.json({
+        transaction: result.transaction,
+        block: transaction.block
+    })
 });
 
 app.get('/address/:address', (req, res) => {
