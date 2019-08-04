@@ -55,10 +55,12 @@ app.post('/register-and-broadcast-node', (req, res) => {
     const { newNodeUrl } = req.body;
     // create an array to hold the promises made for each node
     const registerNodePromises = [];
+    console.log(newNodeUrl)
     // register node url to the network if it isn't already on the network
     if (blockchain.networkNodes.indexOf(newNodeUrl) === -1) {
         blockchain.networkNodes.push(newNodeUrl);
     };
+    console.log(blockchain.networkNodes)
     // broadcast new node to other nodes in the network
     blockchain.networkNodes.forEach(nodeUrl => {
         // for every node on the network make a req to '/register-new-node'
@@ -66,11 +68,12 @@ app.post('/register-and-broadcast-node', (req, res) => {
         // push the request promise obj into 
         registerNodePromises.push(request);
     });
+    console.log(registerNodePromises)
     // run all of the promises in registerNodePromises
     Promise.all(registerNodePromises)
         .then(data => {
 
-            return axios.post(`${newNodeUrl}/register-new-node`, { allNetworkNodes: [...blockchain.networkNodes, blockchain.currentNodeUrl] })
+            return axios.post(`${newNodeUrl}/register-network-nodes`, { allNetworkNodes: [...blockchain.networkNodes, blockchain.currentNodeUrl] })
         })
         .then(data => {
             res.json({
