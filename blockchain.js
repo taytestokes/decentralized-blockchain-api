@@ -90,5 +90,46 @@ Blockchain.prototype.proofOfWork = function(previousBlockHash, currentBlockData)
     return nonce;
 };
 
+Blockchain.prototype.chainIsValid = function(blockchain){
+    // create flag to declare if chain is valid
+    let validChain = true;
+
+    // iterate through every block on the chain
+    // start at 1 to skip genisis block
+    for(let i = 1; i < blockchain.length; i++){
+        // compare current block to prev block
+        const currentBlock = blockchain[i];
+        const previousBlock = blockchain[i - 1];
+
+        // create block hash
+        const blockHash = this.hashBlock(previousBlock['hash'], {transactions: currentBlock['transactions'], index: currentBlock['index']}, currentBlock['nonce']);
+        // check to see if block hash is valid
+        if(blockHash.substring(0,4) !== '0000'){
+            validChain = false;
+        };
+
+        // compare hashes to see if chain is invalid
+        if(currentBlock['previousBlockHash'] !== previousBlock['hash']){
+            // set validChain to false
+            validChain = false;
+        };
+    };
+    // get genisis block
+    const genisisBlock = blockchain[0];
+    // check all props on genisis block are correct
+    const correctNonce = genisisBlock['nonce'] === 100;
+    const correctPreviousBlockHash = genisisBlock['previousBlockHash'] === '0';
+    const correctHash = genisisBlock['hash'] === '0';
+    const correctTransactions = genisisBlock['transactions'].length === 0;
+
+    // runs the test
+    if(!correctNonce || !correctPreviousBlockHash || !correctHash || !correctTransactions){
+        validChain = false;
+    };
+
+    // return valid chain
+    return validChain;
+};
+
 /* Export Blockchain Data Structure */
 module.exports = Blockchain;

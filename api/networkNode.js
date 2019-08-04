@@ -37,6 +37,7 @@ app.post('/transaction/broadcast', (req, res) => {
     const { amount, sender, recipient } = req.body;
     const requestPromises = [];
     const newTransaction = blockchain.createNewTransaction(amount, sender, recipient);
+    console.log(newTransaction)
     blockchain.addTransactionToPendingTransactions(newTransaction);
     // broadcast new transaction to other nodes
     blockchain.networkNodes.forEach((nodeUrl) => {
@@ -87,7 +88,7 @@ app.get('/mine', (req, res) => {
     });
 
     // execute the promises in networkRewquests
-    Promise.all(requestPromises)
+    Promise.all(networkRequests)
         .then(data => {
             // create a body for the req for the mining reward
             const reqBody = {
