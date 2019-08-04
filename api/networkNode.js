@@ -60,24 +60,56 @@ app.post('/transaction/broadcast', (req, res) => {
 
 // create a new block
 app.get('/mine', (req, res) => {
+    // capture the last block in the chain
     const lastBlock = blockchain.getLastBlock();
+    // get the hash of the previous block
     const previousBlockHash = lastBlock['hash'];
+    // create the current block data to store transactions and an index
     const currentBlockData = {
         transactions: blockchain.pendingTransactions,
         index: lastBlock['index'] + 1
     };
+    // create a nonce using the proofOfWork
     const nonce = blockchain.proofOfWork(previousBlockHash, currentBlockData);
+    // develope the blockhash
     const blockHash = blockchain.hashBlock(previousBlockHash, currentBlockData, nonce);
+    // create the new block
     const newBlock = blockchain.createNewBlock(nonce, previousBlockHash, blockHash);
 
-    // reward for ne block
-    // 00 address is a mining reward
-    blockchain.createNewTransaction(12.5, "00", nodeAdress);
-
-    res.json({
-        note: "New block mined succesfully!",
-        block: newBlock
+    // array to store every promise return from the requests below
+    const networkRequests = [];
+    // send new block as data to nodes in the network
+    blockchain.networkNodes.forEach((nodeUrl) => {
+        // make a req for each node on the network
+        const requestPromise = axios.post(`${nodeUrl}/recieve-new-block`, { newBlock });
+        // push requestPrmise into the networkPromises array
+        networkRequests.push(requestPromise);
     });
+
+    // execute the promises in networkRewquests
+    Promise.all(requestPromises)
+        .then(data => {
+            // create a body for the req for the mining reward
+            const reqBody = {
+                amount: 12.5,
+                sender: '00',
+                recipient: nodeAdress
+            };
+            // send a req to /transaction/broadcast to the current nodoe to broadcast the mining reward data
+            return axios.post(`${blockchain.currentNodeUrl}/transaction/broadcast`, reqBody);
+        })
+        .then(data => {
+            // send a response
+            res.json({
+                note: "New block mined succesfully!",
+                block: newBlock
+            });
+        })
+        .catch(error => {
+            res.json({
+                error: 'An Error has appeared, please try again!'
+            })
+        })
 });
 
 // register a node and broadcast it to the network
