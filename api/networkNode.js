@@ -298,7 +298,14 @@ app.get('/transaction/:transactionId', (req, res) => {
 });
 
 app.get('/address/:address', (req, res) => {
-
+    // store address from params
+    const { address } = req.params;
+    // use proto method to find address
+    const result = blockchain.getAddressData(address);
+    // send response with data
+    res.json({
+        addressData: result
+    });
 });
 
 app.listen(port, () => console.log(`Network node running on port: ${port}`));
