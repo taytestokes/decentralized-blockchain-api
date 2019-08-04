@@ -132,5 +132,19 @@ Blockchain.prototype.chainIsValid = function(blockchain){
     return validChain;
 };
 
+Blockchain.prototype.getBlock = function(blockHash){
+    // create flag to know if correct block
+    let correctBlock = null;
+    // iterate through block chain to find the matching hash
+    this.chain.forEach(block => {
+        // check if hashes match
+        if(block.hash === blockHash){
+            correctBlock = block;
+        };
+    });
+    // return the correct block
+    return correctBlock;
+};
+
 /* Export Blockchain Data Structure */
 module.exports = Blockchain;

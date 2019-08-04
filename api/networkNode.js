@@ -8,7 +8,7 @@ const axios = require('axios');
 const nodeAdress = uuid().split('-').join('');
 
 // require blockchain
-const BC = require('../blockchain');
+const BC = require('../blockchain_structure/blockchain');
 const blockchain = new BC();
 
 // middleware
@@ -272,6 +272,25 @@ app.get('/consensus', (req, res) => {
                 note: 'Error, something went wrong!'
             });
         });
+});
+
+app.get('/bock/:blockHash', (req, res) => {
+    // get the block hash from the params of the req
+    const { blockHash } = req.params;
+    // find the block using the hash
+    const result = blockchain.getBlock(blockHash);
+    // send back the result
+    res.json({
+        block: result
+    });
+});
+
+app.get('/transaction/:transactionId', (req, res) => {
+
+});
+
+app.get('/address/:address', (req, res) => {
+
 });
 
 app.listen(port, () => console.log(`Network node running on port: ${port}`));
