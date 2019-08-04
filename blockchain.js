@@ -1,6 +1,7 @@
 /* Package Imports */
 const sha256 = require('sha256');
 const currentNodeUrl = process.argv[3];
+const uuid = require('uuid/v1');
 
 /* Blockchain Data Structure */
 function Blockchain(){
@@ -42,14 +43,22 @@ Blockchain.prototype.getLastBlock = function(){
 };
 
 Blockchain.prototype.createNewTransaction = function(amount, sender, recipient){
+    // create a unique transaction id
+    const transacationId = uuid().split('-').join('');
     // create transaction object
     const newTransaction = {
         amount,
         sender,
-        recipient
+        recipient,
+        transacationId 
     };
+    // return new transaction
+    return newTransaction;
+};
+
+Blockchain.prototype.addTransactionToPendingTransactions = function(transaction){
     // add to the transactions array
-    this.pendingTransactions.push(newTransaction);
+    this.pendingTransactions.push(transaction);
     // find new transaction (last block on chain)
     const lastBlock = this.getLastBlock();
     // return the number of the block the transaction was added to

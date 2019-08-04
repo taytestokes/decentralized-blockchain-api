@@ -114,8 +114,7 @@ app.post('/register-network-nodes', (req, res) => {
     allNetworkNodes.forEach(nodeUrl => {
         // coniditions to not add nodeUrl
         const nodeNotPresent = blockchain.networkNodes.indexOf(nodeUrl) === -1;
-        const uniqueNodeUrl = blockchain.currentNodeUrl !== nodeUrl;
-        console.log(nodeNotPresent, uniqueNodeUrl)
+        const uniqueNodeUrl = blockchain.currentNodeUrl !== nodeUrl; 
         // check for the conditions
         if (nodeNotPresent && uniqueNodeUrl) {
             blockchain.networkNodes.push(nodeUrl);
