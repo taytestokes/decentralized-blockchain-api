@@ -27,6 +27,32 @@ app.post('/transaction', (req, res) => {
     res.json({ note: `transaction will be added in ${blockIndex}` });
 });
 
+// broadcast transaction
+app.post('/transaction/broadcast', (req, res) => {
+    const { amount, sender, recipient } = req.body;
+    const requestPromises = [];
+    const newTransaction = blockchain.createNewTransaction(amount, sender, recipient);
+    blockchain.addTransactionToPendingTransactions(newTransaction);
+    // broadcast new transaction to other nodes
+    blockchain.networkNodes.forEach((nodeUrl) => {
+        const networkPromise = axios.post(`${nodeUrl}/transaction`, { newTransaction });
+        // add the return promise from axios into the requestPromises array
+        requestPromises.push(networkPromise);
+    });
+    // execute all promises
+    Promise.all(requestPromises)
+        .then(data => {
+            res.json({
+                note: 'Transaction created and broadcasted!'
+            })
+        })
+        .catch(error => {
+            res.json({
+                error: 'Warning: broadcast failed!'
+            })
+        });
+});
+
 // create a new block
 app.get('/mine', (req, res) => {
     const lastBlock = blockchain.getLastBlock();
@@ -114,7 +140,7 @@ app.post('/register-network-nodes', (req, res) => {
     allNetworkNodes.forEach(nodeUrl => {
         // coniditions to not add nodeUrl
         const nodeNotPresent = blockchain.networkNodes.indexOf(nodeUrl) === -1;
-        const uniqueNodeUrl = blockchain.currentNodeUrl !== nodeUrl; 
+        const uniqueNodeUrl = blockchain.currentNodeUrl !== nodeUrl;
         // check for the conditions
         if (nodeNotPresent && uniqueNodeUrl) {
             blockchain.networkNodes.push(nodeUrl);
