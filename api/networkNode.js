@@ -124,7 +124,7 @@ app.post('/recieve-new-block', (req, res) => {
     // test to see if new block has correct index
     const correctIndex = lastBlock['index'] + 1 === newBlock['index'];
     // run the test
-    if(correctHash && correctIndex){
+    if (correctHash && correctIndex) {
         // add block to chain
         blockchain.chain.push(newBlock);
         // clear pending transactions
@@ -215,6 +215,63 @@ app.post('/register-network-nodes', (req, res) => {
     res.json({
         note: 'Added network nodes to the new node'
     });
+});
+
+// endpoint to check to see if the current nodes blockchain matches up
+app.get('/consensus', (req, res) => {
+    // create an array to hold promises
+    const reqPromises = [];
+    // get the block chain for every node
+    blockchain.networkNodes.forEach((nodeUrl) => {
+        const reqPromise = axios.get(`${nodeUrl}/blockchain`)
+        // push the promise into the array
+        reqPromises.push(reqPromise);
+    });
+    // execute the promises in the array
+    Promise.all(reqPromises)
+        .then(blockchains => {
+            // create data to use
+            const currentBlockchainLength = blockchain.chain.length;
+            let maxChainLength = currentBlockchainLength;
+            let newLongestChain = null;
+            let newPendingTransactions = null;
+            // iterate through blockchains and check to make sure they match
+            blockchains.forEach((blockchain) => {
+                // compare current blockchain in the iteration to the maxchainlength
+                if (blockchain.chain.length > maxChainLength) {
+                    // reassign max length
+                    maxChainLength = blockchain.chain.length;
+                    // set new longest chain to the one in the current iteration
+                    newLongestChain = blockchain.chain
+                    // replace pending transactions with the one in the current iteration
+                    newPendingTransactions = blockchain.pendingTransactions;
+                };
+            });
+            // check to see if the current chain has been replaced
+            if (!newLongestChain || (newLongestChain && blockchain.chainIsValid(newLongestChain))) {
+                // send a response
+                res.json({
+                    note: 'The chain on the current node has not been replaced!',
+                    chain: blockchain.chain
+                })
+            } else if (newLongestChain && blockchain.chainIsValid(newLongestChain)) {
+                // replace the current nodes chain
+                blockchain.chain = newLongestChain;
+                // replaces the current nodes transactions
+                blockchain.pendingTransactions = newPendingTransactions;
+                // send a response with a message and the new chain
+                res.json({
+                    note: 'This chain has been replaced!',
+                    chain: block.chain
+                });
+            };
+        })
+        .catch(error => {
+            // send error message if somethings fails
+            res.json({
+                note: 'Error, something went wrong!'
+            });
+        });
 });
 
 app.listen(port, () => console.log(`Network node running on port: ${port}`));

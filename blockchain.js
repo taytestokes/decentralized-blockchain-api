@@ -116,6 +116,7 @@ Blockchain.prototype.chainIsValid = function(blockchain){
     };
     // get genisis block
     const genisisBlock = blockchain[0];
+    console.log(genisisBlock)
     // check all props on genisis block are correct
     const correctNonce = genisisBlock['nonce'] === 100;
     const correctPreviousBlockHash = genisisBlock['previousBlockHash'] === '0';
