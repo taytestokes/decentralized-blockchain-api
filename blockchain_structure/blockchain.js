@@ -146,5 +146,28 @@ Blockchain.prototype.getBlock = function(blockHash){
     return correctBlock;
 };
 
+Blockchain.prototype.getTransaction = function(transactionId){
+    // create flag to declare if we found a transaction that matches
+    let correctTransaction = null;
+    // another one to house the block
+    let correctBlock = null;
+    // iterate through blocknchain
+    this.chain.forEach(block => {
+        // iterate through transactions on each block
+        block.transactions.forEach(transaction => {
+            // check if the current transaction id matches the one supplied by user
+            if(transaction.transacationId === transactionId){
+                correctTransaction = transaction;
+                correctBlock = block;
+            }
+        })
+    });
+    // return an obj with info
+    return {
+        transaction: correctTransaction,
+        block: correctBlock
+    };
+};
+
 /* Export Blockchain Data Structure */
 module.exports = Blockchain;
