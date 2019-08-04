@@ -101,7 +101,7 @@ app.get('/mine', (req, res) => {
         .then(data => {
             // send a response
             res.json({
-                note: "New block mined succesfully!",
+                note: "New block mined succesfully and broadcasted!",
                 block: newBlock
             });
         })
@@ -110,6 +110,36 @@ app.get('/mine', (req, res) => {
                 error: 'An Error has appeared, please try again!'
             })
         })
+});
+
+// recieve the broadcasted block
+app.post('/recieve-new-block', (req, res) => {
+    // take the new block off of the req body
+    const { newBlock } = req.body;
+    // get the last block on chain
+    const lastBlock = blockchain.getLastBlock();
+    // test if the lastblock hash matches the newblock previous hash
+    const correctHash = lastBlock.hash === newBlock.previousBlockHash;
+    // test to see if new block has correct index
+    const correctIndex = lastBlock['index'] + 1 === newBlock['index'];
+    // run the test
+    if(correctHash && correctIndex){
+        // add block to chain
+        blockchain.chain.push(newBlock);
+        // clear pending transactions
+        blockchain.pendingTransactions = [];
+        // send response with note and new block
+        res.json({
+            note: 'Block was added to the chain!',
+            newBlock
+        });
+    } else {
+        // send a failure response
+        res.json({
+            note: 'New block was rejected',
+            newBlock
+        });
+    };
 });
 
 // register a node and broadcast it to the network
